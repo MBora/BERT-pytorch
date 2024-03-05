@@ -38,7 +38,7 @@ def train():
     parser.add_argument("--adam_weight_decay", type=float, default=0.01, help="weight_decay of adam")
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="adam first beta value")
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="adam first beta value")
-    parser.add_argument("--load_pretrain", type=bool, default=True, help="load pretrain")
+    parser.add_argument("--load_pretrain", type=int, default=0, help="load pretrain")
 
     args = parser.parse_args()
 
@@ -66,7 +66,7 @@ def train():
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads, dropout=args.dropout)
 
     # Loading pretrain model
-    if args.load_pretrain==True:
+    if args.load_pretrain==1:
         bert.load_state_dict(torch.load("/home/gamma/Workbenches/cav_nlp/bert_cav/BERT-pytorch_Harsh/uncased_L-12_H-768_A-12/"))
     
     print("Creating BERT Trainer")
