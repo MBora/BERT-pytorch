@@ -5,8 +5,8 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 
 from model.language_model import BERTLM, BERT
-from optimizer.optim_schedule import ScheduledOptim
-from optimizer.adamw import AdamW
+from trainer.optimizer.optim_schedule import ScheduledOptim
+from trainer.optimizer.adamw import AdamW
 
 
 class BERTTrainer:
