@@ -38,7 +38,7 @@ def train():
     parser.add_argument("--adam_weight_decay", type=float, default=0.01, help="weight_decay of adam")
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="adam first beta value")
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="adam first beta value")
-    parser.add_argument("--load_pretrain", type=float, default=0.1, help="load pretrain")
+    parser.add_argument("--load_pretrain", type=bool, default=True, help="load pretrain")
 
     args = parser.parse_args()
 
