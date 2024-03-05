@@ -1,7 +1,7 @@
 import torch.nn as nn
 
-from .attention import MultiHeadedAttention
-from .utils import SublayerConnection, FeedForward
+from attention import MultiHeadedAttention
+from utils import SublayerConnection, FeedForward
 
 
 class TransformerBlock(nn.Module):

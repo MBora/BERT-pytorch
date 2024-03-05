@@ -1,1 +1,1 @@
-from .dataset import BERTDataset
+from dataset import BERTDataset
