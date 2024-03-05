@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from attention import MultiHeadedAttention
+from model.attention.multi_head import MultiHeadedAttention
 from utils import SublayerConnection, FeedForward
 
 
