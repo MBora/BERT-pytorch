@@ -3,8 +3,8 @@ import argparse
 from torch.utils.data import DataLoader
 
 from model.bert import BERT
-from trainer import BERTTrainer
-from dataset import BERTDataset
+from from bert_pytorch.trainer import BERTTrainer
+from dataset.dataset import BERTDataset
 
 from vocab_builder import WordVocab
 
