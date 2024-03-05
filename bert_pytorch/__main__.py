@@ -1,4 +1,5 @@
 import argparse
+import torch
 
 from torch.utils.data import DataLoader
 
@@ -37,6 +38,7 @@ def train():
     parser.add_argument("--adam_weight_decay", type=float, default=0.01, help="weight_decay of adam")
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="adam first beta value")
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="adam first beta value")
+    parser.add_argument("--load_pretrain", type=float, default=0.1, help="load pretrain")
 
     args = parser.parse_args()
 
@@ -62,6 +64,10 @@ def train():
 
     print("Building BERT model")
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads, dropout=args.dropout)
+
+    # Loading pretrain model
+    if args.load_pretrain:
+        bert.load_state_dict(torch.load("/home/gamma/Workbenches/cav_nlp/00000-of-00720.pt"))
 
     print("Creating BERT Trainer")
     trainer = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, test_dataloader=test_data_loader,
