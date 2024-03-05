@@ -22,7 +22,7 @@ def train():
     parser.add_argument("-l", "--layers", type=int, default=8, help="number of layers")
     parser.add_argument("-a", "--attn_heads", type=int, default=8, help="number of attention heads")
     parser.add_argument("-s", "--seq_len", type=int, default=20, help="maximum sequence len")
-    parser.add_argument("-d", "--dropout", type=float, default=0.1, help="dropout rate")
+    parser.add_argument("-d", "--dropout", type=float, default=0.0, help="dropout rate")
 
     parser.add_argument("-b", "--batch_size", type=int, default=64, help="number of batch_size")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="number of epochs")
@@ -35,7 +35,7 @@ def train():
     parser.add_argument("--on_memory", type=bool, default=False, help="Loading on memory: true or false")
 
     parser.add_argument("--lr", type=float, default=1e-3, help="learning rate of adam")
-    parser.add_argument("--adam_weight_decay", type=float, default=0.01, help="weight_decay of adam")
+    parser.add_argument("--adam_weight_decay", type=float, default=0.00, help="weight_decay of adam")
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="adam first beta value")
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="adam first beta value")
     parser.add_argument("--load_pretrain", type=int, default=0, help="load pretrain")
@@ -67,7 +67,7 @@ def train():
 
     # Loading pretrain model
     if args.load_pretrain==1:
-        bert.load_state_dict(torch.load("/home/gamma/Workbenches/cav_nlp/bert_cav/BERT-pytorch_Harsh/uncased_L-12_H-768_A-12/"))
+        bert.load_state_dict(torch.load("/home/gamma/Workbenches/cav_nlp/bert_cav/BERT-pytorch_Harsh/bert_model.ckpt.data-00000-of-00001"))
     
     print("Creating BERT Trainer")
     trainer = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, test_dataloader=test_data_loader,
