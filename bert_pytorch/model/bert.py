@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from transformer import TransformerBlock
+from model.transformer import TransformerBlock
 from embedding import BERTEmbedding
 
 
