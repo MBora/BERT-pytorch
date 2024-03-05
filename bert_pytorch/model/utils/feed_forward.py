@@ -1,5 +1,5 @@
 import torch.nn as nn
-from gelu import GELU
+from model.utils.gelu import GELU
 
 
 class FeedForward(nn.Module):
