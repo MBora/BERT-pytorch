@@ -67,7 +67,7 @@ def train():
 
     # Loading pretrain model
     if args.load_pretrain==1:
-        bert.load_state_dict(torch.load("/home/gamma/Workbenches/cav_nlp/bert_cav/BERT-pytorch_Harsh/bert_model.ckpt.data-00000-of-00001"))
+        bert.load_state_dict(torch.load("/home/gamma/Workbenches/cav_nlp/bert_cav/BERT-pytorch_Harsh/uncased_L-12_H-768_A-12/bert_model.ckpt.data-00000-of-00001"))
     
     print("Creating BERT Trainer")
     trainer = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, test_dataloader=test_data_loader,
