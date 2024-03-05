@@ -61,6 +61,8 @@ vocab-builder -c data/corpus.small -o data/vocab.small
 ### 2. Train your own BERT model
 ```shell
 python main.py -c ../data/corpus.small -v ../data/vocab.small -o ../output/loadPretrain.model --load_pretrain=0
+
+nohup python main.py -c ../data/corpus.small -v ../data/vocab.small -o ../output/loadPretrain.model >Base_output.log 2> Baseerr.log &
 ```
 
 ## Language Model Pre-training
