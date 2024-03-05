@@ -68,7 +68,7 @@ def train():
     # Loading pretrain model
     if args.load_pretrain:
         bert.load_state_dict(torch.load("/home/gamma/Workbenches/cav_nlp/00000-of-00720.pt"))
-
+    
     print("Creating BERT Trainer")
     trainer = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, test_dataloader=test_data_loader,
                           lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
