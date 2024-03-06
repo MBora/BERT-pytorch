@@ -65,6 +65,7 @@ class BERTLM_Dual(nn.Module):
 
         x_mean_positive = x_mean + abs(x_mean.min())
         x2_mean_positive = x2_mean + abs(x2_mean.min())
+        print("X MEAN SHAPE", x_mean_positive.shape)
 
         x_mean_normalized = x_mean_positive / x_mean_positive.sum(dim=1)
         x2_mean_normalized = x2_mean_positive / x2_mean_positive.sum(dim=1)
