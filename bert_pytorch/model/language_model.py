@@ -59,7 +59,7 @@ class BERTLM_Dual(nn.Module):
         x = self.bert(x, segment_label)
         x2 = self.bert(x2, segment_label2)
         print("SHAPE", x.shape)
-        loss_kd = js_divergence(x, x2)
+        loss_kd = js_divergence(x.mean(dim=1), x2.mean(dim=1))
         return self.next_sentence(x), self.mask_lm(x), self.next_sentence(x2), self.mask_lm(x2), loss_kd
 
 class NextSentencePrediction(nn.Module):
