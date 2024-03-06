@@ -107,7 +107,8 @@ def train():
     best_acc = 0.0
     for epoch in range(args.epochs):
         trainer.train(epoch)
-        # trainer.save(epoch, args.output_path)
+        if epoch % 100 == 0:
+            trainer.save(epoch, args.output_path)
 
         if epoch % 10 == 0:
             if val_data_loader is not None:
