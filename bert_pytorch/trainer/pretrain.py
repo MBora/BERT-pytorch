@@ -312,7 +312,6 @@ class BERTTrainerDual:
         print("EP%d_%s, avg_loss=" % (epoch, str_code), avg_loss / len(data_loader), "total_acc=",
               total_correct * 100.0 / total_element)
         
-        print()
         return total_correct * 100.0 / total_element
     
     def save(self, epoch, file_path="output/bert_trained.model"):
