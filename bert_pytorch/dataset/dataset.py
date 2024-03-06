@@ -13,10 +13,11 @@ class BERTDataset(Dataset):
         self.datas = []
 
         with open(corpus_path, "r", encoding=encoding) as f:
-            for i, line in enumerate(f):
-                next_line = f.readline()
-                if line != "\n" and next_line != "\n":
-                    self.datas.append((line[:-1], next_line[:-1]))
+            for line in f:
+                if "\t" in line:
+                    sentence1, sentence2 = line.strip().split("\t")  # Split line into two sentences
+                    self.datas.append((sentence1, sentence2))
+
 
     def __len__(self):
         return len(self.datas)
