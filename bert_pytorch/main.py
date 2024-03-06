@@ -9,6 +9,7 @@ from dataset.dataset import BERTDataset, BERTDatasetDual
 
 from vocab_builder import WordVocab
 
+torch.manual_seed(1)
 
 def train():
     parser = argparse.ArgumentParser()
