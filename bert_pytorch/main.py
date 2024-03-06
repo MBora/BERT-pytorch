@@ -26,8 +26,8 @@ def train():
     parser.add_argument("-d", "--dropout", type=float, default=0.1, help="dropout rate")
 
     parser.add_argument("-b", "--batch_size", type=int, default=128, help="number of batch_size")
-    parser.add_argument("-e", "--epochs", type=int, default=500, help="number of epochs")
-    parser.add_argument("-w", "--num_workers", type=int, default=12, help="dataloader worker size")
+    parser.add_argument("-e", "--epochs", type=int, default=300, help="number of epochs")
+    parser.add_argument("-w", "--num_workers", type=int, default=8, help="dataloader worker size")
 
     parser.add_argument("--with_cuda", type=bool, default=True, help="training with CUDA: true, or false")
     parser.add_argument("--log_freq", type=int, default=50, help="printing loss every n iter: setting n")
