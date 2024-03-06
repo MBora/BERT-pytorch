@@ -19,14 +19,14 @@ def train():
     parser.add_argument("-v", "--vocab_path", required=True, type=str, help="built vocab model path with bert-vocab")
     parser.add_argument("-o", "--output_path", required=True, type=str, help="ex)output/bert.model")
 
-    parser.add_argument("-hs", "--hidden", type=int, default=256, help="hidden size of transformer model")
-    parser.add_argument("-l", "--layers", type=int, default=8, help="number of layers")
-    parser.add_argument("-a", "--attn_heads", type=int, default=8, help="number of attention heads")
-    parser.add_argument("-s", "--seq_len", type=int, default=32, help="maximum sequence len")
-    parser.add_argument("-d", "--dropout", type=float, default=0.0, help="dropout rate")
+    parser.add_argument("-hs", "--hidden", type=int, default=768, help="hidden size of transformer model")
+    parser.add_argument("-l", "--layers", type=int, default=12, help="number of layers")
+    parser.add_argument("-a", "--attn_heads", type=int, default=12, help="number of attention heads")
+    parser.add_argument("-s", "--seq_len", type=int, default=64, help="maximum sequence len")
+    parser.add_argument("-d", "--dropout", type=float, default=0.1, help="dropout rate")
 
-    parser.add_argument("-b", "--batch_size", type=int, default=128, help="number of batch_size")
-    parser.add_argument("-e", "--epochs", type=int, default=300, help="number of epochs")
+    parser.add_argument("-b", "--batch_size", type=int, default=64, help="number of batch_size")
+    parser.add_argument("-e", "--epochs", type=int, default=2000, help="number of epochs")
     parser.add_argument("-w", "--num_workers", type=int, default=8, help="dataloader worker size")
 
     parser.add_argument("--with_cuda", type=bool, default=True, help="training with CUDA: true, or false")
@@ -36,7 +36,7 @@ def train():
     parser.add_argument("--on_memory", type=bool, default=False, help="Loading on memory: true or false")
 
     parser.add_argument("--lr", type=float, default=2.5e-5, help="learning rate of adam")
-    parser.add_argument("--adam_weight_decay", type=float, default=0.00, help="weight_decay of adam")
+    parser.add_argument("--adam_weight_decay", type=float, default=0.01, help="weight_decay of adam")
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="adam first beta value")
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="adam first beta value")
     parser.add_argument("--load_pretrain", type=int, default=0, help="load pretrain")
