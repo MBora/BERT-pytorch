@@ -95,9 +95,13 @@ def train():
 
     print("Testing start")
     # test the best epoch
+    bert.load_state_dict(torch.load(args.output_path + ".best"))
+    tester = BERTTrainer(bert, len(vocab), train_dataloader=None, val_dataloader=None, test_dataloader=test_data_loader,
+                         lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
+                         with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
     if test_data_loader is not None:
-        trainer.load(args.output_path + ".best")
-        trainer.test()
+        tester.test()
+    print("All Done!")
 
 # Call train() function
 if __name__ == "__main__":
