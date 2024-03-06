@@ -263,7 +263,7 @@ class BERTTrainerDual:
             mask_loss = self.masked_criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
             mask_loss2 = self.masked_criterion(mask_lm_output2.transpose(1, 2), data["bert_label2"])
 
-            print("loss_kd")
+            print("loss_kd", loss_kd)
             # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
             loss = next_loss + mask_loss + next_loss2 + mask_loss2 + loss_kd
 
