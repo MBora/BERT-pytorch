@@ -109,7 +109,7 @@ def train():
         trainer.train(epoch)
         # trainer.save(epoch, args.output_path)
 
-        if epoch % 5 == 0:
+        if epoch % 10 == 0:
             if val_data_loader is not None:
                 val_acc = trainer.val(epoch)
                 if val_acc > best_acc:
