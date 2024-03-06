@@ -89,35 +89,25 @@ class BERTTrainer:
         str_code = "train" if train else "test"
 
         avg_loss = 0.0
-        avg_loss_mask = 0.0
-        avg_loss_next = 0.0
-        avg_loss_kd = 0.0
         total_correct = 0
         total_element = 0
         if train:
             self.model.train()
-
             for i, data in enumerate(data_loader):
                 # 0. batch_data will be sent into the device(GPU or cpu)
                 data = {key: value.to(self.device) for key, value in data.items()}
 
                 # 1. forward the next_sentence_prediction and masked_lm model
-                next_sent_output, mask_lm_output, next_sent_output2, mask_lm_output2, loss_kd = self.model.forward(data["bert_input"], data["segment_label"], data["bert_input2"], data["segment_label2"])
+                next_sent_output, mask_lm_output = self.model.forward(data["bert_input"], data["segment_label"])
 
                 # 2-1. NLL(negative log likelihood) loss of is_next classification result
                 next_loss = self.next_criterion(next_sent_output, data["is_next"])
-                next_loss2 = self.next_criterion(next_sent_output2, data["is_next2"])
 
                 # 2-2. NLLLoss of predicting masked token word
                 mask_loss = self.masked_criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
-                mask_loss2 = self.masked_criterion(mask_lm_output2.transpose(1, 2), data["bert_label2"])
 
-                # print("loss_kd", loss_kd)
-                # print("SHAPE KD", loss_kd.shape)
-                # print("NEXT loss shape", next_loss.shape)
-                # print("MASK loss shape", mask_loss.shape)
                 # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
-                loss = next_loss + mask_loss + next_loss2 + mask_loss2 + 100*loss_kd.mean()
+                loss = next_loss + mask_loss
 
                 # 3. backward and optimization only in train
                 if train:
@@ -128,9 +118,6 @@ class BERTTrainer:
                 # next sentence prediction accuracy
                 correct = next_sent_output.argmax(dim=-1).eq(data["is_next"]).sum().item()
                 avg_loss += loss.item()
-                avg_loss_mask += mask_loss.item()
-                avg_loss_next += next_loss.item()
-                avg_loss_kd += loss_kd.item() 
                 total_correct += correct
                 total_element += data["is_next"].nelement()
 
@@ -138,9 +125,6 @@ class BERTTrainer:
                     "epoch": epoch,
                     "iter": "[%d/%d]" % (i, len(data_loader)),
                     "avg_loss": avg_loss / (i + 1),
-                    "avg_loss_kd": avg_loss_kd / (i + 1),
-                    "avg_loss_mask": avg_loss_mask / (i + 1),
-                    "avg_loss_next": avg_loss_next / (i + 1),
                     "mask_loss": mask_loss.item(),
                     "next_loss": next_loss.item(),
                     "avg_next_acc": total_correct / total_element * 100,
@@ -157,40 +141,35 @@ class BERTTrainer:
 
             print("EP%d_%s, avg_loss=" % (epoch, str_code), avg_loss / len(data_loader), "total_acc=",
                 total_correct * 100.0 / total_element)
-            
             return total_correct * 100.0 / total_element
         else:
             self.model.eval()
-            # torch inference mode
             with torch.inference_mode():
                 for i, data in enumerate(data_loader):
                     # 0. batch_data will be sent into the device(GPU or cpu)
                     data = {key: value.to(self.device) for key, value in data.items()}
 
                     # 1. forward the next_sentence_prediction and masked_lm model
-                    next_sent_output, mask_lm_output, next_sent_output2, mask_lm_output2, loss_kd = self.model.forward(data["bert_input"], data["segment_label"], data["bert_input2"], data["segment_label2"])
+                    next_sent_output, mask_lm_output = self.model.forward(data["bert_input"], data["segment_label"])
 
                     # 2-1. NLL(negative log likelihood) loss of is_next classification result
                     next_loss = self.next_criterion(next_sent_output, data["is_next"])
-                    next_loss2 = self.next_criterion(next_sent_output2, data["is_next2"])
 
                     # 2-2. NLLLoss of predicting masked token word
                     mask_loss = self.masked_criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
-                    mask_loss2 = self.masked_criterion(mask_lm_output2.transpose(1, 2), data["bert_label2"])
 
-                    # print("loss_kd", loss_kd)
-                    # print("SHAPE KD", loss_kd.shape)
-                    # print("NEXT loss shape", next_loss.shape)
-                    # print("MASK loss shape", mask_loss.shape)
                     # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
-                    loss = next_loss + mask_loss + next_loss2 + mask_loss2 + 100*loss_kd.mean()
+                    loss = next_loss + mask_loss
+
+                    # 3. backward and optimization only in train
+                    if train:
+                        self.optim.zero_grad()
+                        loss.backward()
+                        self.optim.step()
 
                     # next sentence prediction accuracy
                     correct = next_sent_output.argmax(dim=-1).eq(data["is_next"]).sum().item()
                     avg_loss += loss.item()
-                    avg_loss_mask += mask_loss.item()
-                    avg_loss_next += next_loss.item()
-                    avg_loss_kd += loss_kd.item() 
                     total_correct += correct
                     total_element += data["is_next"].nelement()
 
@@ -198,9 +177,6 @@ class BERTTrainer:
                         "epoch": epoch,
                         "iter": "[%d/%d]" % (i, len(data_loader)),
                         "avg_loss": avg_loss / (i + 1),
-                        "avg_loss_kd": avg_loss_kd / (i + 1),
-                        "avg_loss_mask": avg_loss_mask / (i + 1),
-                        "avg_loss_next": avg_loss_next / (i + 1),
                         "mask_loss": mask_loss.item(),
                         "next_loss": next_loss.item(),
                         "avg_next_acc": total_correct / total_element * 100,
@@ -217,9 +193,8 @@ class BERTTrainer:
 
                 print("EP%d_%s, avg_loss=" % (epoch, str_code), avg_loss / len(data_loader), "total_acc=",
                     total_correct * 100.0 / total_element)
-                
                 return total_correct * 100.0 / total_element
-            
+    
     def save(self, epoch, file_path="output/bert_trained.model"):
         """
         Saving the current BERT model on file_path
