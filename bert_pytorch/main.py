@@ -86,7 +86,7 @@ def train():
         trainer.train(epoch)
         # trainer.save(epoch, args.output_path)
 
-        if epoch % 10 == 0:
+        if epoch % 5 == 0:
             if val_data_loader is not None:
                 val_acc = trainer.val(epoch)
                 if val_acc > best_acc:
@@ -94,7 +94,6 @@ def train():
                     trainer.save(epoch, args.output_path + ".best")
 
     print("Testing start")
-
     # test the best epoch
     if test_data_loader is not None:
         trainer.load(args.output_path + ".best")
