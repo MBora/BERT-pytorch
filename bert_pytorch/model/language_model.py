@@ -60,7 +60,16 @@ class BERTLM_Dual(nn.Module):
         x2 = self.bert(x2, segment_label2)
         print(x)
         print("X SHAPE", x.shape)
-        loss_kd = js_divergence(x.mean(dim=1), x2.mean(dim=1))
+        x_mean = x.mean(dim=1)
+        x2_mean = x2.mean(dim=1)
+
+        x_mean_positive = x_mean + abs(x_mean.min())
+        x2_mean_positive = x2_mean + abs(x2_mean.min())
+
+        x_mean_normalized = x_mean_positive / x_mean_positive.sum(dim=1)
+        x2_mean_normalized = x2_mean_positive / x2_mean_positive.sum(dim=1)
+
+        loss_kd = js_divergence(x_mean_normalized, x2_mean_normalized).mean()
         print("After X shape", x.shape)
         return self.next_sentence(x), self.mask_lm(x), self.next_sentence(x2), self.mask_lm(x2), loss_kd
 
