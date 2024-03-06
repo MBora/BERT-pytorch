@@ -295,8 +295,8 @@ class BERTTrainerDual:
                 "avg_loss_kd": avg_loss_kd / (i + 1),
                 "avg_loss_mask": avg_loss_mask / (i + 1),
                 "avg_loss_next": avg_loss_next / (i + 1),
-                # "mask_loss": mask_loss.item(),
-                # "next_loss": next_loss.item(),
+                "mask_loss": mask_loss.item(),
+                "next_loss": next_loss.item(),
                 "avg_next_acc": total_correct / total_element * 100,
                 "loss": loss.item()
             }
