@@ -91,11 +91,11 @@ def train():
                 val_acc = trainer.val(epoch)
                 if val_acc > best_acc:
                     best_acc = val_acc
-                    trainer.save(epoch, args.output_path + ".best")
+                    trainer.save(-1, args.output_path + ".best")
 
     print("Testing start")
     # test the best epoch
-    bert.load_state_dict(torch.load(args.output_path + ".best"))
+    bert.load_state_dict(torch.load(args.output_path + ".best" + ".ep-1"))
     tester = BERTTrainer(bert, len(vocab), train_dataloader=None, val_dataloader=None, test_dataloader=test_data_loader,
                          lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
                          with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
