@@ -18,6 +18,6 @@ def preprocess_and_save(dataset, split, file_path):
 
 # Preprocess and save the train, validation, and test splits
 for split in ['train', 'validation', 'test']:
-    preprocess_and_save(dataset, split, f'/mnt/data/wikitext-2-preprocessed-{split}.txt')
+    preprocess_and_save(dataset, split, f'/data/wikitext-2-preprocessed-{split}.txt')
 
 print("WikiText-2 dataset has been preprocessed and saved.")
