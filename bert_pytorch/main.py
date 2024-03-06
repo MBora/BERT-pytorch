@@ -35,7 +35,7 @@ def train():
     parser.add_argument("--on_memory", type=bool, default=False, help="Loading on memory: true or false")
 
     parser.add_argument("--lr", type=float, default=5e-4, help="learning rate of adam")
-    parser.add_argument("--adam_weight_decay", type=float, default=0.01, help="weight_decay of adam")
+    parser.add_argument("--adam_weight_decay", type=float, default=0.00, help="weight_decay of adam")
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="adam first beta value")
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="adam first beta value")
     parser.add_argument("--load_pretrain", type=int, default=0, help="load pretrain")
