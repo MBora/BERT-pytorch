@@ -37,7 +37,7 @@ class BERTTrainer:
 
         # Setup cuda device for BERT training, argument -c, --cuda should be true
         cuda_condition = torch.cuda.is_available() and with_cuda
-        self.device = torch.device("cuda:0" if cuda_condition else "cpu")
+        self.device = torch.device("cuda" if cuda_condition else "cpu")
 
         # This BERT model will be saved every epoch
         self.bert = bert
@@ -189,7 +189,7 @@ class BERTTrainerDual:
 
         # Setup cuda device for BERT training, argument -c, --cuda should be true
         cuda_condition = torch.cuda.is_available() and with_cuda
-        self.device = torch.device("cuda:0" if cuda_condition else "cpu")
+        self.device = torch.device("cuda" if cuda_condition else "cpu")
 
         # This BERT model will be saved every epoch
         self.bert = bert
