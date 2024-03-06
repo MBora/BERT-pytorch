@@ -4,7 +4,7 @@ from datasets import load_dataset
 dataset = load_dataset("wikitext", "wikitext-2-raw-v1")
 
 # Define the file path for saving the preprocessed dataset
-preprocessed_file_path = '/mnt/data/wikitext-2-preprocessed.txt'
+preprocessed_file_path = './data/wikitext-2-preprocessed.txt'
 
 # Function to preprocess and save the dataset
 def preprocess_and_save(dataset, split, file_path):
