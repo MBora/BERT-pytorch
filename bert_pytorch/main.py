@@ -79,12 +79,12 @@ def train():
 
         print("Creating Dataloader")
         train_data_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
-        test_data_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers) \
+        test_data_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False) \
             if test_dataset is not None else None
 
         if args.val_dataset is not None:
             val_dataset = BERTDataset(args.val_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory)
-            val_data_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+            val_data_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
 
 
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads, dropout=args.dropout)
