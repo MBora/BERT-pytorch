@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 
 from model.bert import BERT
 from trainer.pretrain import BERTTrainer, BERTTrainerDual
-from dataset.dataset import BERTDataset
+from dataset.dataset import BERTDataset, BERTDatasetDual
 
 from vocab_builder import WordVocab
 
@@ -50,23 +50,40 @@ def train():
     print("Loading Vocab", args.vocab_path)
     vocab = WordVocab.load_vocab(args.vocab_path)
     print("Vocab Size: ", len(vocab))
+    if args.dual_mask == 1:
+        print("Loading Train Dataset", args.train_dataset)
+        train_dataset = BERTDatasetDual(args.train_dataset, vocab, seq_len=args.seq_len,
+                                    corpus_lines=args.corpus_lines, on_memory=args.on_memory)
 
-    print("Loading Train Dataset", args.train_dataset)
-    train_dataset = BERTDataset(args.train_dataset, vocab, seq_len=args.seq_len,
-                                corpus_lines=args.corpus_lines, on_memory=args.on_memory)
+        print("Loading Test Dataset", args.test_dataset)
+        test_dataset = BERTDatasetDual(args.test_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory) \
+            if args.test_dataset is not None else None
 
-    print("Loading Test Dataset", args.test_dataset)
-    test_dataset = BERTDataset(args.test_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory) \
-        if args.test_dataset is not None else None
+        print("Creating Dataloader")
+        train_data_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+        test_data_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers) \
+            if test_dataset is not None else None
 
-    print("Creating Dataloader")
-    train_data_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
-    test_data_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers) \
-        if test_dataset is not None else None
+        if args.val_dataset is not None:
+            val_dataset = BERTDatasetDual(args.val_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory)
+            val_data_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+    else:
+        print("Loading Train Dataset", args.train_dataset)
+        train_dataset = BERTDataset(args.train_dataset, vocab, seq_len=args.seq_len,
+                                    corpus_lines=args.corpus_lines, on_memory=args.on_memory)
 
-    if args.val_dataset is not None:
-        val_dataset = BERTDataset(args.val_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory)
-        val_data_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+        print("Loading Test Dataset", args.test_dataset)
+        test_dataset = BERTDataset(args.test_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory) \
+            if args.test_dataset is not None else None
+
+        print("Creating Dataloader")
+        train_data_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+        test_data_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers) \
+            if test_dataset is not None else None
+
+        if args.val_dataset is not None:
+            val_dataset = BERTDataset(args.val_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory)
+            val_data_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
 
 
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads, dropout=args.dropout)
