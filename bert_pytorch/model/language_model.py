@@ -67,8 +67,8 @@ class BERTLM_Dual(nn.Module):
         x2_mean_positive = x2_mean + abs(x2_mean.min())
         print("X MEAN SHAPE", x_mean_positive.shape)
 
-        x_mean_normalized = x_mean_positive / x_mean_positive.sum(dim=1, keep_dim=True)
-        x2_mean_normalized = x2_mean_positive / x2_mean_positive.sum(dim=1, keep_dim=True)
+        x_mean_normalized = x_mean_positive / x_mean_positive.sum(dim=1, keepdim=True)
+        x2_mean_normalized = x2_mean_positive / x2_mean_positive.sum(dim=1, keepdim=True)
 
         loss_kd = js_divergence(x_mean_normalized, x2_mean_normalized).mean()
         print("After X shape", x.shape)

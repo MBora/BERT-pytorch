@@ -268,7 +268,7 @@ class BERTTrainerDual:
             print("NEXT loss shape", next_loss.shape)
             print("MASK loss shape", mask_loss.shape)
             # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
-            loss = next_loss + mask_loss + next_loss2 + mask_loss2 + loss_kd.sum()
+            loss = next_loss + mask_loss + next_loss2 + mask_loss2 + loss_kd.mean()
 
             # 3. backward and optimization only in train
             if train:
