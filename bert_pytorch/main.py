@@ -67,18 +67,23 @@ def train():
     if args.val_dataset is not None:
         val_dataset = BERTDataset(args.val_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory)
         val_data_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
-        
-    print("Building BERT model")
+
+
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads, dropout=args.dropout)
 
     # Loading pretrain model
     if args.load_pretrain==1:
-        bert.load_state_dict(torch.load(""))
+        bert = torch.load("")
     
     print("Creating BERT Trainer")
-    trainer = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
+    if args.dual_mask == 1:
+        trainer = BERTTrainerDual(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
                           lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
                           with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
+    else:
+        trainer = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
+                            lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
+                            with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
 
     print("Training Start")
     best_acc = 0.0

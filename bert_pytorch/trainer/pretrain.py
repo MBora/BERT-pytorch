@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 
-from model.language_model import BERTLM, BERT
+from model.language_model import BERTLM, BERT, BERTLM_Dual
 from trainer.optimizer.optim_schedule import ScheduledOptim
 from trainer.optimizer.adamw import AdamW
 
@@ -172,7 +172,7 @@ class BERTTrainerDual:
     """
 
     def __init__(self, bert: BERT, vocab_size: int,
-                 train_dataloader: DataLoader, test_dataloader: DataLoader = None,
+                 train_dataloader: DataLoader, val_dataloader: DataLoader = None, test_dataloader: DataLoader = None,
                  lr: float = 1e-4, betas=(0.9, 0.999), weight_decay: float = 0.01, warmup_steps=10000,
                  with_cuda: bool = True, cuda_devices=None, log_freq: int = 10):
         """
@@ -194,7 +194,7 @@ class BERTTrainerDual:
         # This BERT model will be saved every epoch
         self.bert = bert
         # Initialize the BERT Language Model, with BERT model
-        self.model = BERTLM(bert, vocab_size).to(self.device)
+        self.model = BERTLM_Dual(bert, vocab_size).to(self.device)
 
         # Distributed GPU training if CUDA can detect more than 1 GPU
         if with_cuda and torch.cuda.device_count() > 1:
@@ -204,6 +204,7 @@ class BERTTrainerDual:
         # Setting the train and test data loader
         self.train_data = train_dataloader
         self.test_data = test_dataloader
+        self.val_data = val_dataloader
 
         # Setting the Adam optimizer with hyper-param
         self.optim = AdamW(self.model.parameters(), lr=lr, betas=betas, weight_decay=weight_decay)
@@ -218,10 +219,13 @@ class BERTTrainerDual:
         print("Total Parameters:", sum([p.nelement() for p in self.model.parameters()]))
 
     def train(self, epoch):
-        self.iteration(epoch, self.train_data)
+        return self.iteration(epoch, self.train_data)
+
+    def val(self, epoch):
+        return self.iteration(epoch, self.val_data, train=False)
 
     def test(self, epoch):
-        self.iteration(epoch, self.test_data, train=False)
+        return self.iteration(epoch, self.test_data, train=False)
 
     def iteration(self, epoch, data_loader, train=True):
         """
@@ -239,22 +243,29 @@ class BERTTrainerDual:
         avg_loss = 0.0
         total_correct = 0
         total_element = 0
+        if train:
+            self.model.train()
+        else:
+            self.model.eval()
 
         for i, data in enumerate(data_loader):
             # 0. batch_data will be sent into the device(GPU or cpu)
             data = {key: value.to(self.device) for key, value in data.items()}
 
             # 1. forward the next_sentence_prediction and masked_lm model
-            next_sent_output, mask_lm_output = self.model.forward(data["bert_input"], data["segment_label"])
+            next_sent_output, mask_lm_output, next_sent_output2, mask_lm_output2, loss_kd = self.model.forward(data["bert_input"], data["segment_label"])
 
             # 2-1. NLL(negative log likelihood) loss of is_next classification result
             next_loss = self.next_criterion(next_sent_output, data["is_next"])
+            next_loss2 = self.next_criterion(next_sent_output2, data["is_next2"])
 
             # 2-2. NLLLoss of predicting masked token word
             mask_loss = self.masked_criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
+            mask_loss2 = self.masked_criterion(mask_lm_output2.transpose(1, 2), data["bert_label2"])
 
+            print("loss_kd")
             # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
-            loss = next_loss + mask_loss
+            loss = next_loss + mask_loss + next_loss2 + mask_loss2 + loss_kd
 
             # 3. backward and optimization only in train
             if train:
@@ -288,7 +299,8 @@ class BERTTrainerDual:
 
         print("EP%d_%s, avg_loss=" % (epoch, str_code), avg_loss / len(data_loader), "total_acc=",
               total_correct * 100.0 / total_element)
-
+        return total_correct * 100.0 / total_element
+    
     def save(self, epoch, file_path="output/bert_trained.model"):
         """
         Saving the current BERT model on file_path
