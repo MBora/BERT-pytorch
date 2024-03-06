@@ -58,14 +58,14 @@ class BERTLM_Dual(nn.Module):
     def forward(self, x, segment_label, x2, segment_label2):
         x = self.bert(x, segment_label)
         x2 = self.bert(x2, segment_label2)
-        print(x)
-        print("X SHAPE", x.shape)
+        # print(x)
+        # print("X SHAPE", x.shape)
         x_mean = x.mean(dim=1)
         x2_mean = x2.mean(dim=1)
 
         x_mean_positive = x_mean + abs(x_mean.min())
         x2_mean_positive = x2_mean + abs(x2_mean.min())
-        print("X MEAN SHAPE", x_mean_positive.shape)
+        # print("X MEAN SHAPE", x_mean_positive.shape)
 
         x_mean_normalized = x_mean_positive / x_mean_positive.sum(dim=1, keepdim=True)
         x2_mean_normalized = x2_mean_positive / x2_mean_positive.sum(dim=1, keepdim=True)
