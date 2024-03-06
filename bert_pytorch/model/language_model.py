@@ -71,7 +71,7 @@ class BERTLM_Dual(nn.Module):
         x2_mean_normalized = x2_mean_positive / x2_mean_positive.sum(dim=1, keepdim=True)
 
         loss_kd = js_divergence(x_mean_normalized, x2_mean_normalized).mean()
-        print("After X shape", x.shape)
+        # print("After X shape", x.shape)
         return self.next_sentence(x), self.mask_lm(x), self.next_sentence(x2), self.mask_lm(x2), loss_kd
 
 class NextSentencePrediction(nn.Module):
