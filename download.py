@@ -3,7 +3,7 @@ from torchtext.datasets import WikiText2
 import os
 
 # Define the file path for the preprocessed dataset
-preprocessed_file_path = '/mnt/data/wikitext-2-preprocessed.txt'
+preprocessed_file_path = './data/wikitext-2-preprocessed.txt'
 
 def preprocess_and_save_wikitext2(file_path):
     # Download the WikiText-2 dataset
