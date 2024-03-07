@@ -136,9 +136,14 @@ def train():
     # test the best epoch
     torch.manual_seed(42)
     bert = torch.load(args.output_path + ".best" + ".ep-1")
-    tester = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
-                        lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
-                        with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
+    if args.dual_mask == 1:
+        tester = BERTTrainerDual(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
+                            lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
+                            with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
+    else:
+        tester = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
+                            lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
+                            with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
     if test_data_loader is not None:
         tester.test(0)
     print("All Done!")
