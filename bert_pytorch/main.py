@@ -134,7 +134,7 @@ def train():
 
     print("Testing start")
     # test the best epoch
-    torch.manual_seed(42)
+    torch.manual_seed(21)
     bert = torch.load(args.output_path + ".best" + ".ep-1")
     if args.dual_mask == 1:
         tester = BERTTrainerDual(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
