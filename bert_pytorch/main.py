@@ -34,7 +34,7 @@ def train():
     parser.add_argument("--log_freq", type=int, default=100, help="printing loss every n iter: setting n")
     parser.add_argument("--corpus_lines", type=int, default=None, help="total number of lines in corpus")
     parser.add_argument("--cuda_devices", type=int, nargs='+', default=None, help="CUDA device ids")
-    parser.add_argument("--on_memory", type=bool, default=False, help="Loading on memory: true or false")
+    parser.add_argument("--on_memory", type=bool, default=True, help="Loading on memory: true or false")
 
     parser.add_argument("--lr", type=float, default=2.5e-5, help="learning rate of adam")
     parser.add_argument("--adam_weight_decay", type=float, default=0.00, help="weight_decay of adam")
@@ -111,7 +111,7 @@ def train():
     if args.debug==0:
         for epoch in range(args.epochs):
             trainer.train(epoch)
-            if epoch % 1 == 0:
+            if epoch % 1 == 0: # this is not needed, you could just put the trainer.save directly without the if statement, like you did with the test loop
                 trainer.save(epoch, args.output_path)
 
             # if epoch % 10 == 0:
