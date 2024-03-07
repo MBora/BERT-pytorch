@@ -161,12 +161,6 @@ class BERTTrainer:
                     # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
                     loss = next_loss + mask_loss
 
-                    # 3. backward and optimization only in train
-                    if train:
-                        self.optim.zero_grad()
-                        loss.backward()
-                        self.optim.step()
-
                     # next sentence prediction accuracy
                     correct = next_sent_output.argmax(dim=-1).eq(data["is_next"]).sum().item()
                     avg_loss += loss.item()
