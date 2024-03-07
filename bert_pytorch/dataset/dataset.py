@@ -133,13 +133,23 @@ class BERTDatasetDual(Dataset):
 
     def __getitem__(self, item):
         t1, t2, is_next_label = self.random_sent(item)
-        t3, t4, is_next_label2 = self.random_sent(item)
+        # Determine mask indices for t1 and t3
 
-        t1_random, t1_label = self.random_word(t1)
-        t2_random, t2_label = self.random_word(t2)
+        # Compute non-overlapping mask indices for t1/t3 and t2/t4
+        total_indices_t1 = set(range(len(t1.split())))
+        mask_indices_t1 = set(random.sample(total_indices_t1, int(len(total_indices_t1) * 0.15)))
+        mask_indices_t3 = total_indices_t1 - mask_indices_t1
 
-        t3_random, t3_label = self.random_word(t3)
-        t4_random, t4_label = self.random_word(t4)
+        total_indices_t2 = set(range(len(t2.split())))
+        mask_indices_t2 = set(random.sample(total_indices_t2, int(len(total_indices_t2) * 0.15)))
+        mask_indices_t4 = total_indices_t2 - mask_indices_t2
+
+        # Apply masking
+        t1_random, t1_label = self.random_word(t1, list(mask_indices_t1))
+        t3_random, t3_label = self.random_word(t1, list(mask_indices_t3))  # Note: t1 is used for t3
+        
+        t2_random, t2_label = self.random_word(t2, list(mask_indices_t2))
+        t4_random, t4_label = self.random_word(t2, list(mask_indices_t4))  # Note: t2 is used for t4
 
         # [CLS] tag = SOS tag, [SEP] tag = EOS tag
         t1 = [self.vocab.sos_index] + t1_random + [self.vocab.eos_index]
@@ -176,42 +186,32 @@ class BERTDatasetDual(Dataset):
                   "segment_label": segment_label,
                   "segment_label2": segment_label2,
                   "is_next": is_next_label,
-                  "is_next2": is_next_label2
+                  "is_next2": is_next_label
                   }
 
         return {key: torch.tensor(value) for key, value in output.items()}
 
-    def random_word(self, sentence):
+    def random_word(self, sentence, mask_indices=None):
         tokens = sentence.split()
-        output_label = [0] * len(tokens)  # Initialize labels as 0 (not masked)
+        output_label = [0] * len(tokens)  # Initialize labels as not masked
 
-        num_to_mask = int(len(tokens) * 0.15)  # 15% of tokens to be masked
-        mask_indices = random.sample(range(len(tokens)), num_to_mask)  # Randomly pick indices without replacement
+        if mask_indices is None:
+            mask_indices = random.sample(range(len(tokens)), int(len(tokens) * 0.15))
 
         for i in mask_indices:
-            # Decide how to mask this token
             mask_decision = random.random()
-
-            # 80% masked with mask token
             if mask_decision < 0.8:
                 tokens[i] = self.vocab.mask_index
-
-            # 10% with a random token
             elif mask_decision < 0.9:
                 tokens[i] = random.randrange(len(self.vocab))
-
-            # 10% unchanged, but still considered as masked for loss calculation
             else:
                 tokens[i] = self.vocab.stoi.get(tokens[i], self.vocab.unk_index)
-
-            # Update the output label for masked tokens
             output_label[i] = self.vocab.stoi.get(tokens[i], self.vocab.unk_index)
-
-        # Update tokens not selected for masking to their indices
+        
         for i, token in enumerate(tokens):
             if i not in mask_indices:
                 tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
-
+        
         return tokens, output_label
 
     def random_sent(self, index):
