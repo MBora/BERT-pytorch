@@ -121,7 +121,7 @@ def train():
                         trainer.save(-1, args.output_path + ".best")
     else:
         for epoch in range(args.epochs):
-            trainer.train(epoch)
+            # trainer.train(epoch)
             # if epoch % 100 == 0:
             #     trainer.save(epoch, args.output_path)
 
