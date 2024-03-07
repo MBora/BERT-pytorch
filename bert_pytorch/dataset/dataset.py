@@ -57,33 +57,37 @@ class BERTDataset(Dataset):
 
     def random_word(self, sentence):
         tokens = sentence.split()
-        output_label = []
+        output_label = [0] * len(tokens)  # Initialize labels as 0 (not masked)
 
-        for i, token in enumerate(tokens):
-            prob = random.random()
-            if prob < 0.15:
-                prob /= 0.15
+        num_to_mask = int(len(tokens) * 0.15)  # 15% of tokens to be masked
+        mask_indices = random.sample(range(len(tokens)), num_to_mask)  # Randomly pick indices without replacement
 
-                # 80% randomly change token to mask token
-                if prob < 0.8:
-                    tokens[i] = self.vocab.mask_index
+        for i in mask_indices:
+            # Decide how to mask this token
+            mask_decision = random.random()
 
-                # 10% randomly change token to random token
-                elif prob < 0.9:
-                    tokens[i] = random.randrange(len(self.vocab))
+            # 80% masked with mask token
+            if mask_decision < 0.8:
+                tokens[i] = self.vocab.mask_index
 
-                # 10% randomly change token to current token
-                else:
-                    tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
+            # 10% with a random token
+            elif mask_decision < 0.9:
+                tokens[i] = random.randrange(len(self.vocab))
 
-                output_label.append(self.vocab.stoi.get(token, self.vocab.unk_index))
-
+            # 10% unchanged, but still considered as masked for loss calculation
             else:
+                tokens[i] = self.vocab.stoi.get(tokens[i], self.vocab.unk_index)
+
+            # Update the output label for masked tokens
+            output_label[i] = self.vocab.stoi.get(tokens[i], self.vocab.unk_index)
+
+        # Update tokens not selected for masking to their indices
+        for i, token in enumerate(tokens):
+            if i not in mask_indices:
                 tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
-                output_label.append(0)
 
         return tokens, output_label
-
+    
     def random_sent(self, index):
         t1, t2 = self.get_corpus_line(index)
 
@@ -179,30 +183,34 @@ class BERTDatasetDual(Dataset):
 
     def random_word(self, sentence):
         tokens = sentence.split()
-        output_label = []
+        output_label = [0] * len(tokens)  # Initialize labels as 0 (not masked)
 
-        for i, token in enumerate(tokens):
-            prob = random.random()
-            if prob < 0.15:
-                prob /= 0.15
+        num_to_mask = int(len(tokens) * 0.15)  # 15% of tokens to be masked
+        mask_indices = random.sample(range(len(tokens)), num_to_mask)  # Randomly pick indices without replacement
 
-                # 80% randomly change token to mask token
-                if prob < 0.8:
-                    tokens[i] = self.vocab.mask_index
+        for i in mask_indices:
+            # Decide how to mask this token
+            mask_decision = random.random()
 
-                # 10% randomly change token to random token
-                elif prob < 0.9:
-                    tokens[i] = random.randrange(len(self.vocab))
+            # 80% masked with mask token
+            if mask_decision < 0.8:
+                tokens[i] = self.vocab.mask_index
 
-                # 10% randomly change token to current token
-                else:
-                    tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
+            # 10% with a random token
+            elif mask_decision < 0.9:
+                tokens[i] = random.randrange(len(self.vocab))
 
-                output_label.append(self.vocab.stoi.get(token, self.vocab.unk_index))
-
+            # 10% unchanged, but still considered as masked for loss calculation
             else:
+                tokens[i] = self.vocab.stoi.get(tokens[i], self.vocab.unk_index)
+
+            # Update the output label for masked tokens
+            output_label[i] = self.vocab.stoi.get(tokens[i], self.vocab.unk_index)
+
+        # Update tokens not selected for masking to their indices
+        for i, token in enumerate(tokens):
+            if i not in mask_indices:
                 tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
-                output_label.append(0)
 
         return tokens, output_label
 
