@@ -92,6 +92,7 @@ def train():
 
     # Loading pretrain model
     if args.load_pretrain==1:
+        print("Loading Pretrain Model", args.output_path + ".best" + ".ep-1")
         bert = torch.load(args.output_path + ".best" + ".ep-1")
     
     print("Creating BERT Trainer")
