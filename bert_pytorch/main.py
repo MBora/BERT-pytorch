@@ -133,8 +133,11 @@ def train():
                         # trainer.save(-1, args.output_path + ".debug")
 
     print("Testing start")
+    # best_acc = 0.0
+    test_accuracies = [] 
     # test the best epoch
-    torch.manual_seed(21)
+    # use diff random seed for test
+    torch.manual_seed(42)
     bert = torch.load(args.output_path + ".best" + ".ep-1")
     if args.dual_mask == 1:
         tester = BERTTrainerDual(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
@@ -144,8 +147,15 @@ def train():
         tester = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
                             lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
                             with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
-    if test_data_loader is not None:
-        tester.test(0)
+    for epoch in range(20):
+        if test_data_loader is not None:
+            test_acc = tester.test(0)
+            test_accuracies.append(test_acc)
+    average_test_accuracy = sum(test_accuracies) / len(test_accuracies)
+    best_test_accuracy = max(test_accuracies)
+
+    print(f"Average test accuracy: {average_test_accuracy}")
+    print(f"Best test accuracy: {best_test_accuracy}")
     print("All Done!")
 
 # Call train() function
