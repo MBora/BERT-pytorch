@@ -148,7 +148,7 @@ def train():
                             lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
                             with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
     if test_data_loader is not None:    
-        for epoch in range(20):
+        for epoch in range(10):
             test_acc = tester.test(0)
             test_accuracies.append(test_acc)
     average_test_accuracy = sum(test_accuracies) / len(test_accuracies)
