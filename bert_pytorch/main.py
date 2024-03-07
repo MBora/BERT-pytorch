@@ -42,6 +42,7 @@ def train():
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="adam first beta value")
     parser.add_argument("--load_pretrain", type=int, default=0, help="load pretrain")
     parser.add_argument("--dual_mask", type=int, default=0, help="dual mask")
+    parser.add_argument("--debug", type=int, default=0, help="debug")
 
     args = parser.parse_args()
 
@@ -91,7 +92,7 @@ def train():
 
     # Loading pretrain model
     if args.load_pretrain==1:
-        bert = torch.load("")
+        bert = torch.load(args.output_path + ".best" + ".ep-1")
     
     print("Creating BERT Trainer")
     if args.dual_mask == 1:
@@ -105,17 +106,30 @@ def train():
 
     print("Training Start")
     best_acc = 0.0
-    for epoch in range(args.epochs):
-        trainer.train(epoch)
-        if epoch % 100 == 0:
-            trainer.save(epoch, args.output_path)
+    if args.debug==0:
+        for epoch in range(args.epochs):
+            trainer.train(epoch)
+            if epoch % 100 == 0:
+                trainer.save(epoch, args.output_path)
 
-        if epoch % 10 == 0:
-            if val_data_loader is not None:
-                val_acc = trainer.val(epoch)
-                if val_acc > best_acc:
-                    best_acc = val_acc
-                    trainer.save(-1, args.output_path + ".best")
+            if epoch % 10 == 0:
+                if val_data_loader is not None:
+                    val_acc = trainer.val(epoch)
+                    if val_acc > best_acc:
+                        best_acc = val_acc
+                        trainer.save(-1, args.output_path + ".best")
+    else:
+        for epoch in range(args.epochs):
+            trainer.train(epoch)
+            # if epoch % 100 == 0:
+            #     trainer.save(epoch, args.output_path)
+
+            if epoch % 10 == 0:
+                if val_data_loader is not None:
+                    val_acc = trainer.val(epoch)
+                    if val_acc > best_acc:
+                        best_acc = val_acc
+                        # trainer.save(-1, args.output_path + ".debug")
 
     print("Testing start")
     # test the best epoch
