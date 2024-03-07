@@ -43,7 +43,8 @@ def train():
     parser.add_argument("--load_pretrain", type=int, default=0, help="load pretrain")
     parser.add_argument("--dual_mask", type=int, default=0, help="dual mask")
     parser.add_argument("--debug", type=int, default=0, help="debug")
-
+    parser.add_argument("--test_epoch_no", type=str, default=".ep-1", help="test epoch no")
+    
     args = parser.parse_args()
 
     # Logging Parameter
@@ -91,9 +92,9 @@ def train():
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads, dropout=args.dropout)
 
     # Loading pretrain model
-    if args.load_pretrain==1:
-        print("Loading Pretrain Model", args.output_path + ".best" + ".ep-1")
-        bert = torch.load(args.output_path + ".best" + ".ep-1")
+    # if args.load_pretrain==1:
+    #     print("Loading Pretrain Model", args.output_path + ".best" + ".ep-1")
+    #     bert = torch.load(args.output_path + ".best" + args.)
     
     print("Creating BERT Trainer")
     if args.dual_mask == 1:
@@ -110,7 +111,7 @@ def train():
     if args.debug==0:
         for epoch in range(args.epochs):
             trainer.train(epoch)
-            if epoch % 100 == 0:
+            if epoch % 5 == 0:
                 trainer.save(epoch, args.output_path)
 
             if epoch % 10 == 0:
@@ -118,7 +119,7 @@ def train():
                     val_acc = trainer.val(epoch)
                     if val_acc > best_acc:
                         best_acc = val_acc
-                        trainer.save(-1, args.output_path + ".best")
+                        trainer.save(epoch, args.output_path + ".best")
     else:
         for epoch in range(args.epochs):
             # trainer.train(epoch)
@@ -138,7 +139,7 @@ def train():
     # test the best epoch
     # use diff random seed for test
     torch.manual_seed(42)
-    bert = torch.load(args.output_path + ".best" + ".ep-1")
+    bert = torch.load(args.output_path + ".best" + args.test_epoch_no)
     if args.dual_mask == 1:
         tester = BERTTrainerDual(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
                             lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
