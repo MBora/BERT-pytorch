@@ -124,13 +124,13 @@ def train():
         for epoch in range(args.epochs):
             # trainer.train(epoch)
             # if epoch % 100 == 0:
-            #     trainer.save(epoch, args.output_path)
+            trainer.save(epoch, args.output_path)
 
-            if epoch % 10 == 0:
-                if val_data_loader is not None:
-                    val_acc = trainer.val(epoch)
-                    if val_acc > best_acc:
-                        best_acc = val_acc
+            # if epoch % 10 == 0:
+            #     if val_data_loader is not None:
+            #         val_acc = trainer.val(epoch)
+            #         if val_acc > best_acc:
+            #             best_acc = val_acc
                         # trainer.save(-1, args.output_path + ".debug")
 
     print("Testing start")
