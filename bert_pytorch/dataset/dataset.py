@@ -210,5 +210,5 @@ class BERTDatasetDual(Dataset):
     def get_corpus_line(self, item):
         return self.datas[item][0], self.datas[item][1]
 
-    def get_random_line(self):
-        return self.datas[random.randrange(len(self.datas))][1]
+    def get_random_line(self, index):
+        return self.datas[index][1]
