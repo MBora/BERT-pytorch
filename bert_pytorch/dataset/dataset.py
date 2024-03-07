@@ -18,6 +18,14 @@ class BERTDataset(Dataset):
                     sentence1, sentence2 = line.strip().split("\t")  # Split line into two sentences
                     self.datas.append((sentence1, sentence2))
 
+
+        self.prepare_negative_samples()
+
+    def prepare_negative_samples(self):
+        indices = list(range(len(self.datas)))
+        random.shuffle(indices)
+        self.negative_indices = indices
+
     def __len__(self):
         return len(self.datas)
 
@@ -79,17 +87,21 @@ class BERTDataset(Dataset):
     def random_sent(self, index):
         t1, t2 = self.get_corpus_line(index)
 
-        # output_text, label(isNotNext:0, isNext:1)
+        # Select next or random sentence
         if random.random() > 0.5:
-            return t1, t2, 1
+            is_next = 1
         else:
-            return t1, self.get_random_line(), 0
+            random_index = self.negative_indices[index % len(self.negative_indices)]
+            t2 = self.get_random_line(random_index)
+            is_next = 0
+
+        return t1, t2, is_next
 
     def get_corpus_line(self, item):
         return self.datas[item][0], self.datas[item][1]
 
-    def get_random_line(self):
-        return self.datas[random.randrange(len(self.datas))][1]
+    def get_random_line(self, index):
+        return self.datas[index][1]
 
 class BERTDatasetDual(Dataset):
     def __init__(self, corpus_path, vocab, seq_len, encoding="utf-8", corpus_lines=None, on_memory=True):
