@@ -379,6 +379,7 @@ class BERTTrainerDual:
                     # print("NEXT loss shape", next_loss.shape)
                     # print("MASK loss shape", mask_loss.shape)
                     # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
+                    loss_kd = loss_kd.mean()
                     loss = next_loss + mask_loss + next_loss2 + mask_loss2 + 100*loss_kd.mean()
 
                     # next sentence prediction accuracy
