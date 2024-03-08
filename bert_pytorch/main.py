@@ -140,7 +140,7 @@ def train():
     # test the best epoch
     # use diff random seed for test
     torch.manual_seed(42)
-    bert = torch.load(args.output_path + ".best" + args.test_epoch_no)
+    bert = torch.load(args.output_path + ".best.ep" + args.test_epoch_no)
     if args.dual_mask == 1:
         tester = BERTTrainerDual(bert, len(vocab), train_dataloader=train_data_loader, val_dataloader=val_data_loader, test_dataloader=test_data_loader,
                             lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
