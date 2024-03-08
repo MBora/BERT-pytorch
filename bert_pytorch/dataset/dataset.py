@@ -93,13 +93,13 @@ class BERTDataset(Dataset):
         return self.datas[random.randrange(len(self.datas))][1]
 
 class BERTDatasetDual(Dataset):
-    def __init__(self, corpus_path, vocab, seq_len, encoding="utf-8", corpus_lines=None, on_memory=True):
+    def __init__(self, corpus_path, vocab, seq_len, encoding="utf-8", corpus_lines=None, on_memory=True, mask_prob=0.15):
         self.vocab = vocab
         self.seq_len = seq_len
         self.corpus_path = corpus_path
         self.encoding = encoding
         self.datas = []
-
+        self.prob = mask_prob
         with open(corpus_path, "r", encoding=encoding) as f:
             for line in f:
                 if "\t" in line:
@@ -173,8 +173,8 @@ class BERTDatasetDual(Dataset):
                 continue
 
             prob = random.random()
-            if prob < 0.15:
-                prob /= 0.15
+            if prob < self.prob:
+                prob /= self.prob
                 mask_indices.append(i)  # Track masked positions
 
                 if prob < 0.8:

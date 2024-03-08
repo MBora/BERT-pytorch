@@ -44,7 +44,8 @@ def train():
     parser.add_argument("--dual_mask", type=int, default=0, help="dual mask")
     parser.add_argument("--debug", type=int, default=0, help="debug")
     parser.add_argument("--test_epoch_no", type=str, default=".ep-1", help="test epoch no")
-    
+    parser.add_argument("--mask_prob", type=float, default=0.15, help="mask probability")
+
     args = parser.parse_args()
 
     # Logging Parameter
@@ -56,10 +57,10 @@ def train():
     if args.dual_mask == 1:
         print("Loading Train Dataset", args.train_dataset)
         train_dataset = BERTDatasetDual(args.train_dataset, vocab, seq_len=args.seq_len,
-                                    corpus_lines=args.corpus_lines, on_memory=args.on_memory)
+                                    corpus_lines=args.corpus_lines, on_memory=args.on_memory, mask_prob=args.mask_prob)
 
         print("Loading Test Dataset", args.test_dataset)
-        test_dataset = BERTDatasetDual(args.test_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory) \
+        test_dataset = BERTDatasetDual(args.test_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory, mask_prob=args.mask_prob) \
             if args.test_dataset is not None else None
 
         print("Creating Dataloader")
@@ -68,7 +69,7 @@ def train():
             if test_dataset is not None else None
 
         if args.val_dataset is not None:
-            val_dataset = BERTDatasetDual(args.val_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory)
+            val_dataset = BERTDatasetDual(args.val_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory, mask_prob=args.mask_prob)
             val_data_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
     else:
         print("Loading Train Dataset", args.train_dataset)
